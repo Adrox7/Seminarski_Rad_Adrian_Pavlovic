@@ -125,7 +125,7 @@ void I2C_LCD_Pulse_En(uint8_t data);               // Šalje kratki signal bez k
 void RC522_Init(void);
 void RC522_WriteRegister(uint8_t reg, uint8_t value); // 1.šalje adresu "reg" u koju se piše / 2.šalje "value" vrijednost koja se piše (tako se RFIDu govori da npr. upali antenu)
 uint8_t RC522_ReadRegister(uint8_t reg);              // Pročita što piše u određenom registru "reg"
-uint8_t RC522_Request(uint8_t *cardType);             // Provjerava je li kartica prisutna u polju čitača i identificira njezin tip - Ako je - vraća 1 / Nije - 0
+uint8_t RC522_Request(uint8_t *cardType);             // Provjerava je li kartica prisutna u polju čitača i identificira njezin tip - Ako je - vraća 0 / Nije - 1
 uint8_t RC522_Anticoll(uint8_t *serNum);              // Sprječavanja sudare (ako ima više kartica) kako bi odabrao jednu karticu i pročitao njezin UID
 void RC522_Reset(void);
 void RC522_AntennaOn(void);                           // Uključi antenu RFID čitača i tako omogućuje komunikaciju sa karticama
@@ -622,3 +622,4 @@ int main(void)
 	           /* USER CODE END 6 */
 	         }
 	         #endif /* USE_FULL_ASSERT */
+
