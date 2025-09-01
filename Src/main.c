@@ -205,7 +205,7 @@ void RC522_WriteRegister(uint8_t reg, uint8_t value) {
 	// NSS (Slave Selecet) se postavlja na LOW što znači da se RFID modul aktivira i spreman je primiti podatke putem SPI-a
     HAL_GPIO_WritePin(RFID_NSS_PORT, RFID_NSS_PIN, GPIO_PIN_RESET);
     uint8_t data[2];             // kreira polje od 2 bajta koji se šalju preko SPI
-    data[0] = (reg << 1) & 0x7E; // adresa registra shiftana ulijevo za 1 i "maskirana" s 0x7E
+    data[0] = (reg << 1) & 0x7E; // mora shiftat ulijevo jer SPI zahtjeva da se adresa pomakne jer bit 7 mora bit R\W a bit 0 nekorišten
     data[1] = value;             // vrijednost koja se upisuje u reigstar
     // šalje 2 bajta putem SPI (prvi bajt - adresa registra, drugi bajt - vrijednost koja se upisuje u taj registar)
     HAL_SPI_Transmit(MFRC522_SPI, data, 2, HAL_MAX_DELAY); // šalje 2 bajta data od gore čipu preko SPI
@@ -225,13 +225,13 @@ uint8_t RC522_ReadRegister(uint8_t reg) {
     HAL_GPIO_WritePin(RFID_NSS_PORT, RFID_NSS_PIN, GPIO_PIN_SET);
     return data[1];
 }
-// Postavlja (uključuje) određene bitove u zadanom registru RFID čitača / npr. uključivanje antene
-void RC522_SetBitMask(uint8_t reg, uint8_t mask) {
+// Postavlja (uključuje) određene bitove u zadanom registru RFID čitača / npr. uključivanje samo antene
+void RC522_SetBitMask(uint8_t reg, uint8_t mask) { // osigura da se mijenjaju samo željeni bitovi, ključno za registre koji kontroliraju više nepovezanih značajki.
     uint8_t tmp = RC522_ReadRegister(reg); // pročita trenutnu vrijednost "reg" i spremi u privremenu varijablu tmp
     RC522_WriteRegister(reg, tmp | mask);  // koristi OR da bi postavio na 1 one bitove koji su 1 u mask
 }
-// Briše određene bitove u zadanom registru RFID-a
-void RC522_ClearBitMask(uint8_t reg, uint8_t mask) { // postavi na 0 bitove u registru čiša bez da dira ostale bitove
+// Briše određene bitove u zadanom registru RFID-a, Kontrola pojedinih bitova bez da dira ostatak registra
+void RC522_ClearBitMask(uint8_t reg, uint8_t mask) { // postavi na 0 bitove u registru bez da dira ostale bitove
     uint8_t tmp = RC522_ReadRegister(reg);           // pročita trenutni sadržaj "reg" i sprema se u "tmp"
     RC522_WriteRegister(reg, tmp & (~mask));         // AND s negacijom - isključi (postavi na 0) bitove definirane u mask / Zapisuje natrag izmijenjenu vrijednost u registar
 }
@@ -273,10 +273,10 @@ uint8_t RC522_ToCard(uint8_t command, uint8_t *sendData, uint8_t sendLen, uint8_
     uint16_t i;             // brojač za petlje
 
     switch (command) {
-        case PCD_TRANSCEIVE: // naredba koja šalje podatke kartici i prima odgovor
-            irqEn = 0x77;    // omogu
+        case PCD_TRANSCEIVE: // provjerava je li command PCD_TRANSCEIVE - koja šalje podatke kartici i prima odgovor
+            irqEn = 0x77;    // omogućuje više prekida 
             waitIRq = 0x30;  // čeka da se dogodi RxIRq (primljen podatak) ili IdleIRq (gotova operacija)
-            break;
+            break;           // Ne radi ništa ako command nije PCD_TRANSCEIVE
         default:
             break;
     }
@@ -286,7 +286,7 @@ uint8_t RC522_ToCard(uint8_t command, uint8_t *sendData, uint8_t sendLen, uint8_
     RC522_SetBitMask(FIFOLevelReg, 0x80);              // FIFO bafer (služi za pohranu podataka sa i na karticu) se prazni i priprema za nove podatke)
     RC522_WriteRegister(CommandReg, PCD_IDLE);         // Postavlja RC552 u PCD_IDLE (Osigurava da nije nijedna stara komanda aktivna) i tako sprjećava konflikte
 
-    // Pisanje podataka u FIFO
+    // Učitava podatke u FIFO međuspremnik MFRC522 i pokreće prijenos na karticu
     for (i = 0; i < sendLen; i++) {                    // prolazi kroz spremik sendData i zapisuje svaki bajt u FIFO registar
         RC522_WriteRegister(FIFODataReg, sendData[i]); // podaci koji će se prenijeti na karticu
     }
@@ -622,4 +622,5 @@ int main(void)
 	           /* USER CODE END 6 */
 	         }
 	         #endif /* USE_FULL_ASSERT */
+
 
