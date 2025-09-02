@@ -36,7 +36,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-// I2C adresa PCF8574T shiftana u lijevo za 1 jer I2C treba 7-bit adresiranje
+// I2C adresa PCF8574T shiftana u lijevo za 1 jer I2C treba 7-bit adresiranje + 1 bit za R/W
 #define PCF8574T_ADDRESS  0x27 << 1 // 0x4E
 
 // LCD
@@ -623,6 +623,7 @@ int main(void)
 	           /* USER CODE END 6 */
 	         }
 	         #endif /* USE_FULL_ASSERT */
+
 
 
 
