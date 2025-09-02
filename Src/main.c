@@ -376,7 +376,8 @@ uint8_t RC522_Anticoll(uint8_t *serNum) {      // "serNum" je pokazivač na niz 
   /* PCD_TRANSCEIVE - Naredba čipu za slanje podataka i primanje odgovora
      serNum - šaljemo prema kartici
      2 - 2 bajta dužina podatka
-     serNum - odgovor kartice UID kontrolni bajt */
+     serNum - odgovor kartice UID kontrolni bajt 
+	 backLen - drži broj valjani broj bitova od odgovora kartice */
     if (status == 0) {                  // osigurava da se validacija izvrši samo ako je odogovor uspješno primljen
         for (i = 0; i < 4; i++) {       // prolazi kroz prva četiri bajda UIDa kartice i računa XOR kako bi se dobio kontrolni bajt (npr. 0x26)
             serNumCheck ^= serNum[i];   // BCC (0x26) se potom uspoređuje s primljenim BCCom koji je poslala kartica
@@ -622,5 +623,6 @@ int main(void)
 	           /* USER CODE END 6 */
 	         }
 	         #endif /* USE_FULL_ASSERT */
+
 
 
