@@ -201,7 +201,7 @@ void I2C_LCD_Init(void) {
 //   RFID READER FUNCTIONS   //
 //===========================//
 // Prvi korak u SPI, priprema čip za primanje adrese i vrijednosti registra
-void RC522_WriteRegister(uint8_t reg, uint8_t value) {
+void RC522_WriteRegister(uint8_t reg, uint8_t value) { // npr. odi na registar 0x01 (CommandReg) i upiši vrijednost 0x0F
 	// NSS (Slave Selecet) se postavlja na LOW što znači da se RFID modul aktivira i spreman je primiti podatke putem SPI-a
     HAL_GPIO_WritePin(RFID_NSS_PORT, RFID_NSS_PIN, GPIO_PIN_RESET);
     uint8_t data[2];             // kreira polje od 2 bajta koji se šalju preko SPI
@@ -623,6 +623,7 @@ int main(void)
 	           /* USER CODE END 6 */
 	         }
 	         #endif /* USE_FULL_ASSERT */
+
 
 
 
