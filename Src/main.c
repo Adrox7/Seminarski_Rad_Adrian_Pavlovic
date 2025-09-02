@@ -302,7 +302,7 @@ uint8_t RC522_ToCard(uint8_t command, uint8_t *sendData, uint8_t sendLen, uint8_
     do {
         n = RC522_ReadRegister(CommIrqReg); // ispituje CommIrqReg do 2000 puta čekajući prekid koji oznaćava završetak naredbe
         i--;
-    } while ((i != 0) && !(n & 0x01) && !(n & waitIRq)); // i != 0 ponovi petlju dok nije isteklo vrijeme
+    } while ((i != 0) && !(n & 0x01) && !(n & waitIRq)); // i != 0 ponovi petlju dok nije isteklo vrijeme /n & waitIRq - očekivani prekid se nije dogodio
                                                          // n & 0x01 nastavi petlju dok timer čipa nije istekao
     RC522_ClearBitMask(BitFramingReg, 0x80);             // Osigurava da čip prestane slati podatke nakon što je naredba dovršena
     if (i != 0) {                                        // provjerava je li petlja završila zbog prekida a ne zbog isteka vremena
@@ -623,6 +623,7 @@ int main(void)
 	           /* USER CODE END 6 */
 	         }
 	         #endif /* USE_FULL_ASSERT */
+
 
 
 
